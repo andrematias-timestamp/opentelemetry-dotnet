@@ -6,15 +6,14 @@
 * [Installation](#installation)
 * [Introduction](#introduction)
 * [Getting started](#getting-started)
-* [Customization](#customization)
-  * [Customize Sampler](#customize-sampler)
-  * [Customize Resource](#customize-resource)
-  * [Filtering and enriching activities using
-    Processor](#filtering-and-enriching-activities-using-processor)
-  * [OpenTelemetry Instrumentation](#opentelemetry-instrumentation)
+* [Configuration](#configuration)
+  * [Instrumentation](#instrumentation)
+  * [Processor](#processor)
+  * [Resource](#resource)
+  * [Sampler](#sampler)
 * [Advanced topics](#advanced-topics)
-  * [Build your own Exporter](#build-your-own-exporter)
-  * [Build your own Sampler](#build-your-own-sampler)
+  * [Building your own Exporter](#building-your-own-exporter)
+  * [Building your own Sampler](#building-your-own-sampler)
 * [References](#references)
 
 ## Installation
@@ -45,9 +44,15 @@ the following.
 Please follow the tutorial and [get started in 5
 minutes](../../docs/getting-started.md).
 
-## Customization
+## Configuration
 
-### Customize Sampler
+### Instrumentation
+
+### Processor
+
+### Resource
+
+### Sampler
 
 [Samplers](https://github.com/open-telemetry/opentelemetry-specification/blob/master/specification/trace/sdk.md#sampler)
 are used to control the noise and overhead introduced by OpenTelemetry by
@@ -67,17 +72,9 @@ using var otel = OpenTelemetrySdk.EnableTracerProvider(b => b
     .UseConsoleExporter());
 ```
 
-### Customize Resource
-
-### Filtering and enriching activities using Processor
-
-### OpenTelemetry Instrumentation
-
-This should link to the Instrumentation documentation.
-
 ## Advanced topics
 
-### Build your own Exporter
+### Building your own Exporter
 
 #### Trace Exporter
 
@@ -131,7 +128,7 @@ OpenTelemetrySdk.EnableOpenTelemetry(b => b
     .UseMyExporter();
 ```
 
-### Build your own Sampler
+### Building your own Sampler
 
 * Samplers should inherit from `ActivitySampler`, and implement `ShouldSample`
   method.
