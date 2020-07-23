@@ -138,24 +138,23 @@ OpenTelemetrySdk.EnableOpenTelemetry(b => b
 ```csharp
 class MySampler : ActivitySampler
 {
-    public override string Description { get; } = "my custom sampler";
-
     public override SamplingResult ShouldSample(in ActivitySamplingParameters samplingParameters)
     {
-        bool sampledIn;
+        var shouldSample = false;
         var parentContext = samplingParameters.ParentContext;
+
         if (parentContext != null && parentContext.IsValid())
         {
-            sampledIn = (
+            shouldSample = (
                 parentContext.TraceFlags & ActivityTraceFlags.Recorded
             ) != 0;
         }
         else
         {
-            sampledIn = Stopwatch.GetTimestamp() % 2 == 0;
+            shouldSample = Stopwatch.GetTimestamp() % 2 == 0;
         }
 
-        return new Decision(sampledIn);
+        return new Decision(shouldSample);
     }
 }
 ```
