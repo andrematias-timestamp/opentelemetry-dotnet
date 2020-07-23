@@ -59,13 +59,13 @@ The following sample shows how to change it to
 with sampling probability of 25%.
 
 ```csharp
-using var openTelemetry = OpenTelemetrySdk.EnableOpenTelemetry(builder => builder
-                .AddActivitySource("companyname.product.library")
-                .SetSampler(new ProbabilitySampler(.25))
-                .UseConsoleExporter());
-```
+using OpenTelemetry.Trace.Samplers;
 
-The above requires import of the namespace `OpenTelemetry.Trace.Samplers`.
+using var otel = OpenTelemetrySdk.EnableTracerProvider(b => b
+    .AddActivitySource("MyCompany.MyProduct.MyLibrary")
+    .SetSampler(new ProbabilitySampler(0.25))
+    .UseConsoleExporter());
+```
 
 ### Customize Resource
 
@@ -81,8 +81,8 @@ This should link to the Instrumentation documentation.
 
 #### Trace Exporter
 
-* Exporters should subclass `ActivityExporter` and implement `ExportAsync` and
-  `ShutdownAsync` methods.
+* Exporters should inherit from `ActivityExporter` and implement `ExportAsync`
+  and `ShutdownAsync` methods.
 * Depending on user's choice and load on the application `ExportAsync` may get
   called concurrently with zero or more activities.
 * Exporters should expect to receive only sampled-in ended activities.
@@ -90,13 +90,8 @@ This should link to the Instrumentation documentation.
 * Exporters should not modify activities they receive (the same activity may be
   exported again by different exporter).
 
-It's a good practice to make exporter `IDisposable` and shut it down in
-IDispose unless it was shut down explicitly. This helps when exporters are
-registered with dependency injection framework and their lifetime is tight to
-the app lifetime.
-
 ```csharp
-class MyExporter : ActivityExporter, IDisposable
+class MyExporter : ActivityExporter
 {
     public override Task<ExportResult> ExportAsync(
         IEnumerable<Activity> batch, CancellationToken cancellationToken)
@@ -119,14 +114,9 @@ class MyExporter : ActivityExporter, IDisposable
         return Task.CompletedTask;
     }
 
-    public void Dispose()
+    protected override void Dispose(bool disposing)
     {
-        // ...
-    }
-
-    protected virtual void Dispose(bool disposing)
-    {
-        // ...
+        // flush the data and clean up the resource
     }
 }
 ```
@@ -143,7 +133,10 @@ OpenTelemetrySdk.EnableOpenTelemetry(b => b
 
 ### Build your own Sampler
 
-You can build your own sampler by subclassing `ActivitySampler`:
+* Samplers should inherit from `ActivitySampler`, and implement `ShouldSample`
+  method.
+* `ShouldSample` should not block or take long time, since it will be called on
+  critical code path.
 
 ```csharp
 class MySampler : ActivitySampler
